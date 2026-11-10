@@ -42,3 +42,11 @@ async def login( # IMPORTANTE: Adicionado 'async' na função
         "access_token": access_token,
         "token_type": "bearer"
     }
+
+from app.api.dependencies import get_current_user
+
+@router.get("/me")
+async def read_current_user(
+    current_user: Usuario = Depends(get_current_user)
+):
+    return {"email": current_user.email}
