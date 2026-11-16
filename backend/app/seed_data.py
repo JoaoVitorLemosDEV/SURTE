@@ -6,6 +6,7 @@ Run with:
 or from the project root:
     python backend/app/seed_data.py
 """
+from sqlalchemy import select
 import asyncio
 import random
 from datetime import datetime, timedelta
@@ -37,15 +38,18 @@ async def create_sample_data():
         await conn.run_sync(Base.metadata.create_all)
 
     async with SessionLocal() as session:
+
+        # Evita inserir os dados de demonstração mais de uma vez
+        result = await session.execute(
+            select(Usuario).where(Usuario.email == "produtor1@example.com")
+        )
+
+        if result.scalar_one_or_none():
+            print("Dados de demonstração já cadastrados. Nenhuma alteração realizada.")
+            return
+        
         # --------- Users ---------
         users = [
-            Usuario(
-                nome_completo="Admin User",
-                email="admin@example.com",
-                senha_hash=hash_password("admin123"),
-                cargo="admin",
-                ativo=True,
-            ),
             Usuario(
                 nome_completo="Produtor 1",
                 email="produtor1@example.com",
