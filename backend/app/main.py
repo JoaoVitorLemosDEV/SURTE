@@ -1,6 +1,9 @@
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
+from app.db.database import engine, Base
+from app.models import domain
 
 # Importação de todas as rotas da V1
 from app.api.v1.routers import auth, entrevistados, programas, usuarios, entrevistas, relatorios
@@ -19,7 +22,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Registo de todos os módulos na API com os seus respetivos prefixos e tags
+# Criação automática das tabelas do banco de dados
+@app.on_event("startup")
+async def create_tables():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    print("Tabelas do banco de dados verificadas/criadas com sucesso!")
+
+# Registo das rotas
 app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["Autenticação"])
 app.include_router(entrevistados.router, prefix=f"{settings.API_V1_STR}/entrevistados", tags=["Entrevistados"])
 app.include_router(programas.router, prefix=f"{settings.API_V1_STR}/programas", tags=["Programas"])
@@ -30,4 +40,3 @@ app.include_router(relatorios.router, prefix=f"{settings.API_V1_STR}/relatorios"
 @app.get("/")
 def health_check():
     return {"status": "ok", "message": "API SURTE Completa e Operante"}
-
