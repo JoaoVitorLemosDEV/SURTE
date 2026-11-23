@@ -14,9 +14,14 @@ const initialForm = {
 
 function getErrorMessage(error, fallback) {
   const detail = error?.response?.data?.detail;
+
   if (Array.isArray(detail)) {
-    return detail.map((item) => item.msg).join(" ");
+    return detail
+      .map((item) => item.mensagem || item.msg)
+      .filter(Boolean)
+      .join(" ");
   }
+
   return detail || fallback;
 }
 
@@ -128,7 +133,7 @@ export default function Entrevistados() {
 
     try {
       const response = editingId
-        ? await api.put(`/entrevistados/${editingId}`, payload)
+        ? await api.patch(`/entrevistados/${editingId}`, payload)
         : await api.post("/entrevistados/", payload);
 
       setEntrevistados((current) => {

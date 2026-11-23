@@ -1,5 +1,6 @@
-
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.db.database import engine, Base
@@ -13,6 +14,26 @@ app = FastAPI(
     version="2.0.0",
     openapi_url=f"{settings.API_V1_STR}/openapi.json"
 )
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    erros = []
+
+    for erro in exc.errors():
+        mensagem = erro["msg"]
+
+        if "email" in str(erro["type"]).lower() or "email" in mensagem.lower():
+            mensagem = "Informe um endereço de e-mail válido. Exemplo: usuario@email.com."
+
+        erros.append({
+            "campo": erro["loc"][-1],
+            "mensagem": mensagem
+        })
+
+    return JSONResponse(
+        status_code=422,
+        content={"detail": erros}
+    )
 
 app.add_middleware(
     CORSMiddleware,

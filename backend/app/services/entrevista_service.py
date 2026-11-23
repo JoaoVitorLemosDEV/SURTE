@@ -4,7 +4,8 @@ from typing import Optional
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.domain import EntrevistaStatus, Participacao
+from app.models.domain import Entrevistado, EntrevistaStatus, Participacao
+from sqlalchemy.future import select
 from app.repositories.entrevista_repository import EntrevistaRepository
 
 
@@ -49,6 +50,25 @@ class EntrevistaService:
         return entrevista
 
     async def agendar(self, dados: dict, usuario_id: int):
+        resultado = await self.db.execute(
+            select(Entrevistado).where(
+                Entrevistado.id == dados["entrevistado_id"]
+            )
+        )
+        entrevistado = resultado.scalars().first()
+
+        if not entrevistado:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Entrevistado não encontrado."
+            )
+
+        if not entrevistado.autorizacao_imagem_voz:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Não é possível agendar a entrevista: o entrevistado não autorizou o uso de imagem e voz."
+            )
+
         dados["usuario_id"] = usuario_id
         dados["status"] = EntrevistaStatus.agendada
 
