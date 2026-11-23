@@ -269,7 +269,7 @@ export default function Entrevistados() {
                   <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">Instituicao</th>
                   <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">Contato</th>
                   <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">Temas</th>
-                  <th className="text-center px-6 py-4 text-sm font-semibold text-gray-700">Acoes</th>
+                  <th className="text-center px-6 py-4 text-sm font-semibold text-gray-700">Ações</th>
                 </tr>
               </thead>
               <tbody>

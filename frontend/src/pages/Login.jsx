@@ -2,8 +2,8 @@ import { useState } from "react";
 import api from "../services/api";
 
 export default function Login({ onLogin }) {
-  const [email, setEmail] = useState("admin@surte.com");
-  const [password, setPassword] = useState("admin123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 

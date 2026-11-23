@@ -29,6 +29,19 @@ class Usuario(Base):
     cargo = Column(Enum(UsuarioCargo), nullable=False)
     ativo = Column(Boolean, default=True)
 
+class ConfiguracaoSistema(Base):
+    __tablename__ = "configuracoes_sistema"
+
+    id = Column(Integer, primary_key=True, index=True)
+    nome_instituicao = Column(String(255), nullable=False)
+    email_contato = Column(String(255), nullable=True)
+    telefone_contato = Column(String(20), nullable=True)
+    atualizado_em = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now()
+    )
+
 class Programa(Base):
     __tablename__ = "programas"
     id = Column(Integer, primary_key=True, index=True)

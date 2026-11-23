@@ -14,3 +14,11 @@ class UsuarioResponse(UsuarioBase):
     ativo: bool
 
     model_config = ConfigDict(from_attributes=True)
+
+class UsuarioUpdate(BaseModel):
+    nome_completo: str
+    email: EmailStr
+    cargo: UsuarioCargo
+
+class UsuarioStatusUpdate(BaseModel):
+    ativo: bool

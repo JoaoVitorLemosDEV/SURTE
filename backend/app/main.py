@@ -6,7 +6,7 @@ from app.db.database import engine, Base
 from app.models import domain
 
 # Importação de todas as rotas da V1
-from app.api.v1.routers import auth, entrevistados, programas, usuarios, entrevistas, relatorios
+from app.api.v1.routers import auth, entrevistados, programas, usuarios, entrevistas, relatorios, configuracoes
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -36,6 +36,7 @@ app.include_router(programas.router, prefix=f"{settings.API_V1_STR}/programas", 
 app.include_router(usuarios.router, prefix=f"{settings.API_V1_STR}/usuarios", tags=["Usuários"])
 app.include_router(entrevistas.router, prefix=f"{settings.API_V1_STR}/entrevistas", tags=["Entrevistas"])
 app.include_router(relatorios.router, prefix=f"{settings.API_V1_STR}/relatorios", tags=["Relatórios"])
+app.include_router(configuracoes.router,prefix=f"{settings.API_V1_STR}/configuracoes",tags=["Configurações"])
 
 @app.get("/")
 def health_check():

@@ -1,4 +1,3 @@
-
 import { BrowserRouter, Routes, Route } from "react-router";
 import { useState, useEffect } from "react";
 import api from "./services/api";
@@ -74,6 +73,11 @@ export default function App() {
     setAuthError("");
   };
 
+  const handleLogin = (accessToken) => {
+  window.history.replaceState(null, "", "/");
+  setToken(accessToken);
+};
+
   if (isChecking) {
     return (
       <div className="flex h-screen items-center justify-center bg-gray-50">
@@ -83,7 +87,7 @@ export default function App() {
   }
 
   if (!token) {
-    return <Login onLogin={setToken} />;
+    return <Login onLogin={handleLogin} />;
   }
 
   if (authError) {
