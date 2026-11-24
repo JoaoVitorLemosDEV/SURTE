@@ -77,6 +77,16 @@ export default function Login({ onLogin }) {
             />
           </div>
 
+
+          <div className="flex justify-end">
+            <button
+              type="button"
+              className="text-sm text-[var(--surte-azul-primario)] hover:underline"
+            >
+              Esqueceu sua senha?
+            </button>
+          </div>
+
           <button
             type="submit"
             disabled={loading}
