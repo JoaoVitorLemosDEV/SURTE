@@ -19,7 +19,7 @@ const menuItems = [
   { icon: Settings, label: "Configurações", path: "/configuracoes" },
 ];
 
-export default function Sidebar({ isOpen, onClose, onLogout }) {
+export default function Sidebar({ isOpen, onClose, onLogout, usuario }) {
   return (
     <>
       {/* Overlay para mobile */}
@@ -76,25 +76,31 @@ export default function Sidebar({ isOpen, onClose, onLogout }) {
           ))}
         </nav>
 
-        <div className="p-4 border-t border-white/10">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[var(--surte-amarelo-destaque)] flex items-center justify-center text-[var(--surte-azul-escuro)] font-bold">
-              U
-            </div>
-            <div className="flex-1">
-              <p className="text-white text-sm font-medium">Usuário Admin</p>
-              <p className="text-white/60 text-xs">admin@surte.com</p>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={onLogout}
-            className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-white bg-white/10 hover:bg-white/20 transition-colors text-sm font-medium"
-          >
-            <LogOut size={16} />
-            Sair
-          </button>
-        </div>
+       <div className="p-4 border-t border-white/10">
+  <div className="flex items-center gap-3">
+    <div className="w-10 h-10 rounded-full bg-[var(--surte-amarelo-destaque)] flex items-center justify-center text-[var(--surte-azul-escuro)] font-bold">
+      {usuario?.nome_completo?.charAt(0)?.toUpperCase() || "U"}
+    </div>
+
+    <div className="flex-1 min-w-0">
+      <p className="text-white text-sm font-medium truncate">
+        {usuario?.nome_completo || "Usuário"}
+      </p>
+      <p className="text-white/60 text-xs truncate">
+        {usuario?.email || ""}
+      </p>
+    </div>
+  </div>
+
+  <button
+    type="button"
+    onClick={onLogout}
+    className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-white bg-white/10 hover:bg-white/20 transition-colors text-sm font-medium"
+  >
+    <LogOut size={16} />
+    Sair
+  </button>
+</div>
       </aside>
     </>
   );

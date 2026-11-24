@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { Settings, Bell, Shield, Users as UsersIcon, Lock } from "lucide-react";
 import api from "../services/api";
 
-export default function Configuracoes() {
+export default function Configuracoes({ usuario }) {
+  const isAdmin = usuario?.cargo === "admin";
 
   const [senhaAtual, setSenhaAtual] = useState("");
   const [novaSenha, setNovaSenha] = useState("");
@@ -38,7 +39,12 @@ const [salvandoConfiguracao, setSalvandoConfiguracao] = useState(false);
 const [mensagemConfiguracao, setMensagemConfiguracao] = useState("");
 const [erroConfiguracao, setErroConfiguracao] = useState("");
 
-  useEffect(() => {
+useEffect(() => {
+  if (!isAdmin) {
+    setCarregandoConfiguracao(false);
+    return;
+  }
+
   const carregarConfiguracao = async () => {
     setCarregandoConfiguracao(true);
     setErroConfiguracao("");
@@ -60,7 +66,7 @@ const [erroConfiguracao, setErroConfiguracao] = useState("");
   };
 
   carregarConfiguracao();
-}, []);
+}, [isAdmin]);
 
   useEffect(() => {
   if (
@@ -86,7 +92,7 @@ const [erroConfiguracao, setErroConfiguracao] = useState("");
 ]);
 
   useEffect(() => {
-  if (!mostrarUsuarios) return;
+  if (!isAdmin || !mostrarUsuarios) return;
 
   const carregarUsuarios = async () => {
     setCarregandoUsuarios(true);
@@ -108,7 +114,7 @@ const [erroConfiguracao, setErroConfiguracao] = useState("");
   };
 
   carregarUsuarios();
-}, [mostrarUsuarios]);
+}, [mostrarUsuarios, isAdmin]);
 
   const cadastrarUsuario = async (e) => {
   e.preventDefault();
@@ -151,11 +157,21 @@ const [erroConfiguracao, setErroConfiguracao] = useState("");
   setSalvandoEdicao(true);
 
   try {
-    await api.put(`/usuarios/${usuarioEditando.id}`, {
-      nome_completo: usuarioEditando.nome_completo,
-      email: usuarioEditando.email,
-      cargo: usuarioEditando.cargo,
-    });
+  await api.put(`/usuarios/${usuarioEditando.id}`, {
+  nome_completo: usuarioEditando.nome_completo,
+  email: usuarioEditando.email,
+  cargo: usuarioEditando.cargo,
+});
+
+const usuarioOriginal = usuarios.find(
+  (u) => u.id === usuarioEditando.id
+);
+
+if (usuarioOriginal && usuarioOriginal.ativo !== usuarioEditando.ativo) {
+  await api.patch(`/usuarios/${usuarioEditando.id}/status`, {
+    ativo: usuarioEditando.ativo,
+  });
+}
 
     setMensagemUsuarios("Usuário atualizado com sucesso!");
     setUsuarioEditando(null);
@@ -279,6 +295,7 @@ const [erroConfiguracao, setErroConfiguracao] = useState("");
 )}
 
       <div className="space-y-4 sm:space-y-6">
+        {isAdmin && (
         <div className="bg-white rounded-lg p-4 sm:p-6 shadow-sm border border-gray-100">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 bg-[var(--surte-azul-primario)]/10 rounded-lg flex items-center justify-center">
@@ -351,6 +368,7 @@ onChange={(e) =>
 </button>
 </form>
         </div>
+      )}
 
         <div className="bg-white rounded-lg p-4 sm:p-6 shadow-sm border border-gray-100">
           <div className="flex items-center gap-3 mb-4">
@@ -460,7 +478,7 @@ onChange={(e) =>
                   value={novaSenha}
                   onChange={(e) => setNovaSenha(e.target.value)}
                   autoComplete="new-password"
-                  minLength={12}
+                  minLength={8}
                   required
                   className="w-full px-3 sm:px-4 py-2 border border-gray-200 rounded-lg text-sm sm:text-base"
                 />
@@ -475,7 +493,7 @@ onChange={(e) =>
                   value={confirmarSenha}
                   onChange={(e) => setConfirmarSenha(e.target.value)}
                   autoComplete="new-password"
-                  minLength={12}
+                  minLength={8}
                   required
                   className="w-full px-3 sm:px-4 py-2 border border-gray-200 rounded-lg text-sm sm:text-base"
                 />
@@ -510,6 +528,7 @@ onChange={(e) =>
           </div>
         </div>
 
+        {isAdmin && (
         <div className="bg-white rounded-lg p-4 sm:p-6 shadow-sm border border-gray-100">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 bg-[var(--surte-bege-claro)]/30 rounded-lg flex items-center justify-center">
@@ -588,13 +607,13 @@ onChange={(e) =>
       <input
         type="password"
         required
-        minLength={12}
+        minLength={8}
         value={novoUsuario.senha}
         onChange={(e) =>
           setNovoUsuario({ ...novoUsuario, senha: e.target.value })
         }
         className="w-full px-4 py-2 border border-gray-200 rounded-lg"
-        placeholder="Mínimo de 12 caracteres"
+        placeholder="Mínimo de 8 caracteres"
       />
     </div>
 
@@ -754,6 +773,34 @@ onChange={(e) =>
           </select>
         </div>
 
+        <div className="flex items-center justify-between border-t border-gray-100 pt-4">
+  <div>
+    <p className="text-sm font-medium text-gray-700">
+      Status do usuário
+    </p>
+    <p className="text-sm text-gray-500">
+      Defina se o usuário pode acessar o sistema.
+    </p>
+  </div>
+
+  <label className="flex items-center gap-2 cursor-pointer">
+    <input
+      type="checkbox"
+      checked={usuarioEditando.ativo}
+      onChange={(e) =>
+        setUsuarioEditando({
+          ...usuarioEditando,
+          ativo: e.target.checked,
+        })
+      }
+      className="h-4 w-4 accent-[var(--surte-azul-primario)]"
+    />
+    <span className="text-sm font-medium">
+      {usuarioEditando.ativo ? "Ativo" : "Inativo"}
+    </span>
+  </label>
+</div>
+
         <div className="flex gap-3">
           <button
             type="submit"
@@ -781,6 +828,7 @@ onChange={(e) =>
             </div>
           )}
         </div>
+        )}
       </div>
     </div>
   );

@@ -14,6 +14,7 @@ import Configuracoes from "./pages/Configuracoes";
 
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [usuario, setUsuario] = useState(null); 
   const [token, setToken] = useState(() =>
     localStorage.getItem("surte_token")
   );
@@ -38,7 +39,8 @@ export default function App() {
       setAuthError("");
 
       try {
-        await api.get("/auth/me");
+        const response = await api.get("/auth/me");
+        setUsuario(response.data);
       } catch (error) {
         if (cancelled) return;
 
@@ -69,6 +71,7 @@ export default function App() {
   const handleLogout = () => {
     localStorage.removeItem("surte_token");
     setToken(null);
+    setUsuario(null);
     setSidebarOpen(false);
     setAuthError("");
   };
@@ -119,6 +122,7 @@ export default function App() {
           isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
           onLogout={handleLogout}
+          usuario={usuario}
         />
 
         <main className="flex-1 overflow-y-auto w-full">
@@ -131,7 +135,7 @@ export default function App() {
               <Route path="/agendamentos" element={<Agendamentos />} />
               <Route path="/historico" element={<Historico />} />
               <Route path="/relatorios" element={<Relatorios />} />
-              <Route path="/configuracoes" element={<Configuracoes />} />
+              <Route path="/configuracoes" element={<Configuracoes usuario={usuario} />}/>
             </Routes>
           </div>
         </main>

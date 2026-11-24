@@ -54,7 +54,12 @@ from app.api.dependencies import get_current_user
 async def read_current_user(
     current_user: Usuario = Depends(get_current_user)
 ):
-    return {"email": current_user.email}
+    return {
+        "id": current_user.id,
+        "nome_completo": current_user.nome_completo,
+        "email": current_user.email,
+        "cargo": current_user.cargo.value
+    }
 
 @router.put("/change-password")
 async def change_password(
